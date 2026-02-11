@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom"; 
 
-// 🔹 IMPORT DATA FROM NEW FILE
+// 🔹 ICONS IMPORT
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  X, 
+  Package,       
+  Wrench,        
+  Search,        
+  FileText,      
+  ListChecks     
+} from "lucide-react";
+
+// 🔹 IMPORT DATA
 import { categoriesData } from "../data/categoriesData"; 
 
 /* 🔹 IMAGES */
@@ -13,7 +24,7 @@ import catalogueIcon from "../assets/images/icon-catalogue.png";
 import brandsIcon from "../assets/images/icon-brands.png";
 import dropdownIcon from "../assets/images/icon-dropdown.png";
 import arrowRight from "../assets/images/arrow-right.png";
-import search from "../assets/images/search.png";
+import searchIcon from "../assets/images/search.png"; 
 
 export default function Header({ onCatalogClick }) {
   const navigate = useNavigate();
@@ -25,17 +36,30 @@ export default function Header({ onCatalogClick }) {
   const [mobileSelectedCategory, setMobileSelectedCategory] = useState(null);
   const [mobileSelectedSubCat, setMobileSelectedSubCat] = useState(null);
 
-  // 🔹 MAIN NAVIGATION FUNCTION
-  const handleNavigation = (item) => {
+  // 🔹 1. CATEGORY NAVIGATION (Drill Down Leaf Node)
+  const handleCategoryNavigation = (item) => {
     if (item.children && item.children.length > 0) return;
 
+    // Reset everything, Close Menu & Navigate
     setShowCategories(false); 
     setMobileOpen(false);    
+    setMobileLevel1(null);
+    setMobileSelectedCategory(null);
+    setMobileSelectedSubCat(null);
+
     navigate(`/category/${item.slug}`); 
+  };
+
+  // 🔹 2. STATIC PAGE NAVIGATION (Direct Links)
+  const handleStaticNavigation = (path) => {
+    setMobileOpen(false);
+    setShowCategories(false);
+    navigate(path);
   };
 
   /* Scroll Lock & Outside Click Effects */
   useEffect(() => { document.body.style.overflow = mobileOpen ? "hidden" : "auto"; }, [mobileOpen]);
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".category-wrapper")) setShowCategories(false);
@@ -49,17 +73,27 @@ export default function Header({ onCatalogClick }) {
       {/* 🔹 TOP BAR */}
       <div className="bg-[#0C4BB2] text-white">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+           {/* Mobile Toggle Button */}
            <button className="lg:hidden text-2xl" onClick={() => setMobileOpen(true)}>☰</button>
-           <img src={logo} alt="CTP" className="h-12" />
+           
+           <img src={logo} alt="CTP" className="h-12 cursor-pointer" onClick={() => navigate('/')} />
            
            <nav className="hidden lg:flex gap-6 text-sm font-medium">
-            {["Home", "Products", "Documentation & Support", "Brands", "Pricing/Quote", "Contact us", "About Us"].map((item) => (
-              <a key={item} href="#" className="hover:underline">{item}</a>
+            {[
+              { name: "Home", path: "/" },
+              { name: "Products", path: "/products" },
+              { name: "Documentation & Support", path: "/support" },
+              { name: "Brands", path: "/brands" },
+              { name: "Pricing/Quote", path: "/quote" },
+              { name: "Contact us", path: "/contact" },
+              { name: "About Us", path: "/about" }
+            ].map((item) => (
+              <a key={item.name} onClick={() => navigate(item.path)} className="hover:underline cursor-pointer">{item.name}</a>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center bg-white rounded-md px-3 py-2 w-56">
-            <img src={search} className="h-4 w-4 mr-2" />
+            <img src={searchIcon} className="h-4 w-4 mr-2" />
             <input className="outline-none text-sm text-black w-full" placeholder="Search" />
           </div>
         </div>
@@ -75,19 +109,19 @@ export default function Header({ onCatalogClick }) {
                 isOpen={showCategories} 
                 onClick={(e) => { e.stopPropagation(); setShowCategories(!showCategories); }} 
             />
-            <DropdownButton label="Parts Finder" icon={partsIcon} />
+            <DropdownButton label="Parts Finder" icon={partsIcon} onClick={() => navigate('/parts-finder')} />
             <DropdownButton label="Catalogue" icon={catalogueIcon} onClick={onCatalogClick} />
-            <DropdownButton label="Brands We Carry" icon={brandsIcon} />
+            <DropdownButton label="Brands We Carry" icon={brandsIcon} onClick={() => navigate('/brands')} />
           </div>
         </div>
 
-        {/* 🔹 MEGA MENU - DRILL DOWN STYLE */}
+        {/* 🔹 MEGA MENU (DESKTOP) */}
         {showCategories && (
           <div className="relative z-40 category-wrapper">
             <MegaMenu 
                 arrowRight={arrowRight} 
                 data={categoriesData} 
-                onNavigate={handleNavigation} 
+                onNavigate={handleCategoryNavigation} 
             />
           </div>
         )}
@@ -96,12 +130,9 @@ export default function Header({ onCatalogClick }) {
       {/* 🔹 MOBILE MENU */}
       {mobileOpen && (
         <MobileMenu
-          close={() => {
-            setMobileOpen(false);
-            setMobileLevel1(null);
-            setMobileSelectedCategory(null);
-            setMobileSelectedSubCat(null);
-          }}
+          close={() => setMobileOpen(false)}
+          
+          // State Props
           mobileLevel1={mobileLevel1}
           setMobileLevel1={setMobileLevel1}
           mobileSelectedCategory={mobileSelectedCategory}
@@ -110,7 +141,10 @@ export default function Header({ onCatalogClick }) {
           setMobileSelectedSubCat={setMobileSelectedSubCat}
           
           data={categoriesData}
-          onNavigate={handleNavigation} 
+          
+          // Navigation Functions
+          onNavigate={handleCategoryNavigation} 
+          onStaticNavigate={handleStaticNavigation} 
         />
       )}
     </header>
@@ -131,9 +165,7 @@ function DropdownButton({ label, icon, isOpen, onClick, children }) {
     );
 }
 
-/* =================================================================
-   🔹 MEGA MENU (UPDATED: DRILL-DOWN STYLE WITH 4 LEVELS)
-   ================================================================= */
+/* ... MegaMenu Component (Desktop) ... */
 function MegaMenu({ arrowRight, data, onNavigate }) {
   const [selectedLevel1, setSelectedLevel1] = useState(null);
   const [selectedLevel2, setSelectedLevel2] = useState(null);
@@ -149,241 +181,257 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
 
   return (
     <div className="w-full bg-white shadow-xl px-10 py-8 text-sm">
-
-      {/* ================= LEVEL 1 ================= */}
+      {/* LEVEL 1 */}
       {!selectedLevel1 && (
         <>
-          <h3 className="mb-6 text-lg font-bold text-[#0C4BB2] border-b pb-2">
-            Select a Category
-          </h3>
-
+          <h3 className="mb-6 text-lg font-bold text-[#0C4BB2] border-b pb-2">Select a Category</h3>
           <div className="grid grid-cols-4 gap-y-2 gap-x-4">
             {data.map((category) => (
-              <div
-                key={category._id}
-                className="flex justify-between items-center cursor-pointer group hover:bg-blue-50 p-1 rounded transition"
-                onClick={() => handleItemClick(category, setSelectedLevel1)}
-              >
-                <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">
-                  {category.name}
-                </span>
-
-                {category.children?.length > 0 && (
-                  <ChevronRight
-                    size={16}
-                    className="text-gray-400 group-hover:text-[#0C4BB2]"
-                  />
-                )}
+              <div key={category._id} className="flex justify-between items-center cursor-pointer group hover:bg-blue-50 p-1 rounded transition" onClick={() => handleItemClick(category, setSelectedLevel1)}>
+                <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">{category.name}</span>
+                {category.children?.length > 0 && <ChevronRight size={16} className="text-gray-400 group-hover:text-[#0C4BB2]" />}
               </div>
             ))}
           </div>
         </>
       )}
 
-      {/* ================= LEVEL 2 ================= */}
+      {/* LEVEL 2 */}
       {selectedLevel1 && !selectedLevel2 && (
         <>
-          {/* Header */}
-          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6  border-b pb-2">
-            <button
-              className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold"
-              onClick={() => setSelectedLevel1(null)}
-            >
-              <ChevronLeft size={18} />
-              Back
+          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6 border-b pb-2">
+            <button className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold" onClick={() => setSelectedLevel1(null)}>
+              <ChevronLeft size={18} /> Back
             </button>
-
-            <h2 className="text-[16px] text-[#0C4BB2] font-bold">
-              {selectedLevel1.name}
-            </h2>
+            <h2 className="text-[16px] text-[#0C4BB2] font-bold">{selectedLevel1.name}</h2>
           </div>
-
-          {/* Layout */}
           <div className="grid grid-cols-4 gap-12">
-
-            {/* Left Side */}
             <div className="flex flex-col gap-4">
               {selectedLevel1.children.map((subItem) => (
-                <div
-                  key={subItem._id}
-                  className="flex justify-between items-center cursor-pointer group"
-                  onClick={() => handleItemClick(subItem, setSelectedLevel2)}
-                >
-                  <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">
-                    {subItem.name}
-                  </span>
-
-                  {subItem.children?.length > 0 && (
-                    <ChevronRight
-                      size={18}
-                      className="text-gray-400 group-hover:text-[#0C4BB2]"
-                    />
-                  )}
+                <div key={subItem._id} className="flex justify-between items-center cursor-pointer group" onClick={() => handleItemClick(subItem, setSelectedLevel2)}>
+                  <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">{subItem.name}</span>
+                  {subItem.children?.length > 0 && <ChevronRight size={18} className="text-gray-400 group-hover:text-[#0C4BB2]" />}
                 </div>
               ))}
             </div>
-            </div>
-          
-            
-
-         
- 
-       
-        </>
-          )}
-     
-
-      {/* ================= LEVEL 3 ================= */}
-      {selectedLevel2 && !selectedLevel3 && (
-        <>
-          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6  border-b pb-2">
-            <button
-              className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold"
-              onClick={() => setSelectedLevel2(null)}
-            >
-              <ChevronLeft size={18} />
-              Back 
-            </button>
-
-            <h2 className="text-[16px] text-[#0C4BB2] font-bold">
-              {selectedLevel1.name}
-              <span className="mx-2 text-gray-400">/</span>
-              {selectedLevel2.name}
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-4 gap-12">
-            <div className="flex flex-col gap-4">
-                {selectedLevel2.children.map((child) => (
-              <div
-                key={child._id}
-                className="flex justify-between items-center cursor-pointer group"
-                onClick={() => handleItemClick(child, setSelectedLevel3)}
-              >
-                <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">
-                  {child.name}
-                </span>
-
-                {child.children?.length > 0 && (
-                  <ChevronRight
-                    size={18}
-                    className="text-gray-400 group-hover:text-[#0C4BB2]"
-                  />
-                )}
-              </div>
-            ))}
-            </div>
-          
           </div>
         </>
       )}
 
-      {/* ================= LEVEL 4 ================= */}
+      {/* LEVEL 3 */}
+      {selectedLevel2 && !selectedLevel3 && (
+        <>
+          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6 border-b pb-2">
+            <button className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold" onClick={() => setSelectedLevel2(null)}>
+              <ChevronLeft size={18} /> Back 
+            </button>
+            <h2 className="text-[16px] text-[#0C4BB2] font-bold">{selectedLevel1.name} <span className="mx-2 text-gray-400">/</span> {selectedLevel2.name}</h2>
+          </div>
+          <div className="grid grid-cols-4 gap-12">
+            <div className="flex flex-col gap-4">
+              {selectedLevel2.children.map((child) => (
+                <div key={child._id} className="flex justify-between items-center cursor-pointer group" onClick={() => handleItemClick(child, setSelectedLevel3)}>
+                  <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">{child.name}</span>
+                  {child.children?.length > 0 && <ChevronRight size={18} className="text-gray-400 group-hover:text-[#0C4BB2]" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* LEVEL 4 */}
       {selectedLevel3 && (
         <>
-          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6  border-b pb-2">
-            <button
-              className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold"
-              onClick={() => setSelectedLevel3(null)}
-            >
-              <ChevronLeft size={18} />
-              Back 
+          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6 border-b pb-2">
+            <button className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold" onClick={() => setSelectedLevel3(null)}>
+              <ChevronLeft size={18} /> Back 
             </button>
-
-            <h2 className="text-[16px] text-[#0C4BB2] font-bold">
-              {selectedLevel2.name}
-              <span className="mx-2 text-gray-400">/</span>
-              {selectedLevel3.name}
-            </h2>
+            <h2 className="text-[16px] text-[#0C4BB2] font-bold">{selectedLevel2.name} <span className="mx-2 text-gray-400">/</span> {selectedLevel3.name}</h2>
           </div>
-
           {selectedLevel3.children?.length === 0 ? (
-            <p className="text-gray-500 italic">
-              No further sub-categories found.
-            </p>
+            <p className="text-gray-500 italic">No further sub-categories found.</p>
           ) : (
             <div className="grid grid-cols-4 gap-12">
               <div className="flex flex-col gap-4">
-                     {selectedLevel3.children.map((deepChild) => (
-                <div
-                  key={deepChild._id}
-                  className=" p-1 cursor-pointer text-[18px] text-[#0C4BB2] hover:bg-blue-50 transition"
-                  onClick={() => onNavigate(deepChild)}
-                >
+                  {selectedLevel3.children.map((deepChild) => (
+                <div key={deepChild._id} className="p-1 cursor-pointer text-[18px] text-[#0C4BB2] hover:bg-blue-50 transition" onClick={() => onNavigate(deepChild)}>
                   {deepChild.name}
                 </div>
               ))}
-
               </div>
-         
             </div>
           )}
         </>
       )}
-
     </div>
   );
 }
 
 
-/* ... MobileMenu (Same as before) ... */
-function MobileMenu({ close, mobileLevel1, setMobileLevel1, mobileSelectedCategory, setMobileSelectedCategory, mobileSelectedSubCat, setMobileSelectedSubCat, data, onNavigate }) {
+/* =================================================================
+   🔹 MOBILE MENU (CORRECTED & FINALIZED)
+   ================================================================= */
+function MobileMenu({ close, mobileLevel1, setMobileLevel1, mobileSelectedCategory, setMobileSelectedCategory, mobileSelectedSubCat, setMobileSelectedSubCat, data, onNavigate, onStaticNavigate }) {
+    
+    // 🔹 Main Menu Items
+    const mainMenuItems = [
+        { 
+            name: "Categories", 
+            icon: <Package size={20} />, 
+            action: () => setMobileLevel1("Categories"), // Drill down
+            hasArrow: true
+        },
+        { 
+            name: "Find Service", 
+            icon: <Wrench size={20} />, 
+            action: () => onStaticNavigate('/find-service'), 
+            hasArrow: true
+        },
+        { 
+            name: "Parts Finder", 
+            icon: <Search size={20} />, 
+            action: () => onStaticNavigate('/parts-finder'), 
+            hasArrow: true
+        },
+        { 
+            name: "Diagrams", 
+            icon: <FileText size={20} />, 
+            action: () => onStaticNavigate('/diagrams'), 
+            hasArrow: true
+        },
+        { 
+            name: "Quick Order", 
+            icon: <ListChecks size={20} />, 
+            action: () => onStaticNavigate('/quick-order'), 
+            hasArrow: false
+        }
+    ];
+
+    // 🔹 Bottom Links
+    const bottomLinks = [
+        { name: "Home", path: "/" },
+        { name: "Products", path: "/products" },
+        { name: "Documentation & Support", path: "/support" },
+        { name: "Brands", path: "/brands" },
+        { name: "Pricing / Quote", path: "/quote" },
+        { name: "Contact us", path: "/contact" },
+        { name: "About Us", path: "/about" }
+    ];
+
     return (
-      <div className="fixed inset-0 z-50 bg-black/40 text-[#0C4BB2]">
-        <div className="w-[85%] h-full bg-white p-4 overflow-y-auto">
-          <div className="flex justify-between mb-4"><h3 className="font-bold text-lg">Menu</h3><button onClick={close}>✕</button></div>
-  
-          {!mobileLevel1 && (
-              <p className="py-3 border-b font-semibold flex justify-between" onClick={() => setMobileLevel1("Categories")}>Categories <ChevronRight /></p>
-          )}
+      <div className="fixed inset-0 z-50 bg-black/40 text-[#0C4BB2] lg:hidden">
+        
+        {/* Sidebar Container */}
+        <div className="w-[85%] max-w-[350px] h-full bg-white flex flex-col shadow-2xl">
           
-          {mobileLevel1 === "Categories" && !mobileSelectedCategory && (
-            <>
-              <button onClick={() => setMobileLevel1(null)}><div className="flex items-center gap-2 mb-4"><ChevronLeft /><span>Back</span></div></button>
-              {data.map((category) => (
-                  <div key={category._id}>
-                      <p className="font-bold mt-4 border-b pb-2 flex justify-between" onClick={() => setMobileSelectedCategory(category)}>
-                         {category.name} <ChevronRight />
-                      </p>
-                  </div>
-              ))}
-            </>
-          )}
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+             <h3 className="font-bold text-lg text-gray-800">Menu</h3>
+             <button onClick={close} className="p-1 hover:bg-gray-200 rounded-full">
+                <X size={24} className="text-gray-600" />
+             </button>
+          </div>
   
-          {mobileSelectedCategory && !mobileSelectedSubCat && (
-            <>
-              <button onClick={() => setMobileSelectedCategory(null)}><div className="flex items-center gap-2 mb-4"><ChevronLeft /><span>Back</span></div></button>
-              <h4 className="font-bold mb-4 text-xl">{mobileSelectedCategory.name}</h4>
-              {mobileSelectedCategory.children.map((subItem) => (
-                <p
-                  key={subItem._id}
-                  className="flex justify-between py-3 border-b"
-                  onClick={() => {
-                      if(subItem.children && subItem.children.length > 0) {
-                          setMobileSelectedSubCat(subItem);
-                      } else {
-                          onNavigate(subItem);
-                      }
-                  }}
-                >
-                  {subItem.name}
-                  {subItem.children && subItem.children.length > 0 && <ChevronRight />}
-                </p>
-              ))}
-            </>
-          )}
-  
-          {mobileSelectedSubCat && (
-            <>
-              <button onClick={() => setMobileSelectedSubCat(null)}><div className="flex items-center gap-2 mb-4"><ChevronLeft /><span>Back</span></div></button>
-              <h4 className="font-bold mb-2 text-lg">{mobileSelectedSubCat.name}</h4>
-              {mobileSelectedSubCat.children.map((child) => (
-                <p key={child._id} className="py-2 border-b text-sm" onClick={() => onNavigate(child)}>
-                  {child.name}
-                </p>
-              ))}
-            </>
-          )}
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto">
+
+            {/* --- VIEW 1: MAIN MENU LIST --- */}
+            {!mobileLevel1 && (
+              <div className="flex flex-col">
+                 <div className="flex flex-col">
+                    {mainMenuItems.map((item, index) => (
+                        <div key={index} onClick={item.action} className="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors">
+                            <div className="flex items-center gap-4">
+                                <span className="text-[#0C4BB2]">{item.icon}</span>
+                                <span className="font-bold text-gray-800 text-sm">{item.name}</span>
+                            </div>
+                            {item.hasArrow && <ChevronRight size={18} className="text-gray-400" />}
+                        </div>
+                    ))}
+                 </div>
+                 
+                 {/* Bottom Links */}
+                 <div className="flex flex-col bg-gray-50 p-4 gap-4 mt-2">
+                    {bottomLinks.map((link, index) => (
+                        <p 
+                            key={index} 
+                            className="text-gray-600 font-medium text-sm cursor-pointer hover:text-[#0C4BB2]"
+                            onClick={() => onStaticNavigate(link.path)}
+                        >
+                            {link.name}
+                        </p>
+                    ))}
+                 </div>
+              </div>
+            )}
+            
+            {/* --- VIEW 2: CATEGORIES (Level 1) --- */}
+            {mobileLevel1 === "Categories" && !mobileSelectedCategory && (
+              <div className="p-4">
+                <button onClick={() => setMobileLevel1(null)} className="mb-4 flex items-center gap-2 text-gray-500 font-semibold">
+                    <ChevronLeft size={20} /> <span>Main Menu</span>
+                </button>
+                <h3 className="font-bold text-[18px] mb-4 text-[#0C4BB2] border-b pb-2">All Categories</h3>
+                {data.map((category) => (
+                    <div key={category._id}>
+                        <p className="font-medium py-3 border-b flex justify-between items-center cursor-pointer hover:bg-gray-50" onClick={() => setMobileSelectedCategory(category)}>
+                           {category.name} <ChevronRight size={16} className="text-gray-400" />
+                        </p>
+                    </div>
+                ))}
+              </div>
+            )}
+    
+            {/* --- VIEW 3: SUB-CATEGORIES (Level 2) --- */}
+            {mobileSelectedCategory && !mobileSelectedSubCat && (
+              <div className="p-4">
+                <button onClick={() => setMobileSelectedCategory(null)} className="mb-4 flex items-center gap-2 text-gray-500 font-semibold">
+                    <ChevronLeft size={20} /> <span>Back</span>
+                </button>
+                <h4 className="font-bold mb-4 text-xl text-[#0C4BB2]">{mobileSelectedCategory.name}</h4>
+                {mobileSelectedCategory.children.map((subItem) => (
+                  <p key={subItem._id} className="flex justify-between items-center py-3 border-b cursor-pointer hover:bg-gray-50"
+                    onClick={() => {
+                        if(subItem.children && subItem.children.length > 0) {
+                            setMobileSelectedSubCat(subItem);
+                        } else {
+                             onNavigate(subItem); // ✅ Navigates and Closes Menu
+                        }
+                    }}
+                  >
+                    <span className="text-sm font-medium">{subItem.name}</span>
+                    {subItem.children && subItem.children.length > 0 && <ChevronRight size={16} className="text-gray-400" />}
+                  </p>
+                ))}
+              </div>
+            )}
+    
+            {/* --- VIEW 4: CHILD ITEMS (Level 3) --- */}
+            {mobileSelectedSubCat && (
+              <div className="p-4">
+                <button onClick={() => setMobileSelectedSubCat(null)} className="mb-4 flex items-center gap-2 text-gray-500 font-semibold">
+                    <ChevronLeft size={20} /> <span>Back</span>
+                </button>
+                <h4 className="font-bold mb-2 text-lg text-[#0C4BB2]">{mobileSelectedSubCat.name}</h4>
+                {mobileSelectedSubCat.children.length === 0 ? (
+                    <p className="text-gray-500 italic py-2">No further items.</p>
+                ) : (
+                    mobileSelectedSubCat.children.map((child) => (
+                        <p 
+                            key={child._id} 
+                            
+                            className="py-3 border-b text-sm font-medium hover:bg-gray-50 cursor-pointer" 
+                            onClick={() => onNavigate(child)} // ✅ Navigates and Closes Menu
+                        >
+                           {child.name}
+                        </p>
+                    ))
+                )}
+              </div>
+            )}
+
+          </div>
         </div>
       </div>
     );
