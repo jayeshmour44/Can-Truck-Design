@@ -153,7 +153,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
       {/* ================= LEVEL 1 ================= */}
       {!selectedLevel1 && (
         <>
-          <h3 className="mb-6 text-lg font-bold text-gray-800 border-b pb-2">
+          <h3 className="mb-6 text-lg font-bold text-[#0C4BB2] border-b pb-2">
             Select a Category
           </h3>
 
@@ -184,7 +184,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
       {selectedLevel1 && !selectedLevel2 && (
         <>
           {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6  border-b pb-2">
             <button
               className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold"
               onClick={() => setSelectedLevel1(null)}
@@ -193,7 +193,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
               Back
             </button>
 
-            <h2 className="text-[16px] text-gray-800 font-bold">
+            <h2 className="text-[16px] text-[#0C4BB2] font-bold">
               {selectedLevel1.name}
             </h2>
           </div>
@@ -236,7 +236,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
       {/* ================= LEVEL 3 ================= */}
       {selectedLevel2 && !selectedLevel3 && (
         <>
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6  border-b pb-2">
             <button
               className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold"
               onClick={() => setSelectedLevel2(null)}
@@ -245,7 +245,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
               Back 
             </button>
 
-            <h2 className="text-[16px] text-gray-800 font-bold">
+            <h2 className="text-[16px] text-[#0C4BB2] font-bold">
               {selectedLevel1.name}
               <span className="mx-2 text-gray-400">/</span>
               {selectedLevel2.name}
@@ -281,7 +281,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
       {/* ================= LEVEL 4 ================= */}
       {selectedLevel3 && (
         <>
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6  border-b pb-2">
             <button
               className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold"
               onClick={() => setSelectedLevel3(null)}
@@ -290,7 +290,7 @@ function MegaMenu({ arrowRight, data, onNavigate }) {
               Back 
             </button>
 
-            <h2 className="text-[16px] text-gray-800 font-bold">
+            <h2 className="text-[16px] text-[#0C4BB2] font-bold">
               {selectedLevel2.name}
               <span className="mx-2 text-gray-400">/</span>
               {selectedLevel3.name}
