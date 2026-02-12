@@ -46,6 +46,31 @@ export const categoriesData = [
             { _id: "1-3-1", name: "Brake Pads", slug: "brake-pads", children: [] },
             { _id: "1-3-2", name: "Rotors", slug: "rotors", children: [] }
         ]
+      },
+          {
+        _id: "1-4",
+        name: "Electrical Components",
+        slug: "electrical-components",
+        children: [
+            { _id: "1-4-1", name: "Wiring Harnesses", slug: "wiring-harnesses", children: [] },
+            { _id: "1-4-2", name: "Batteries", slug: "batteries", children: [] }
+        ]
+      },    {
+        _id: "1-5",
+        name: "Transmission",
+        slug: "transmission",
+        children: [
+            { _id: "1-5-1", name: "Transmission Fluid", slug: "transmission-fluid", children: [] },
+            { _id: "1-5-2", name: "Transmission Gears", slug: "transmission-gears", children: [] }
+        ]
+      },    {
+        _id: "1-6",
+        name: "Braking System",
+        slug: "braking-system",
+        children: [
+            { _id: "1-6-1", name: "Brake Pads", slug: "brake-pads", children: [] },
+            { _id: "1-6-2", name: "Rotors", slug: "rotors", children: [] }
+        ]
       }
     ]
   },
@@ -105,6 +130,81 @@ export const categoriesData = [
               ] 
           }
         ]
+      },
+       {
+        _id: "2-3",
+        name: "Smartphones",
+        slug: "smartphones",
+        children: [
+          { 
+              _id: "2-3-1", 
+              name: "Android", 
+              slug: "android", 
+              children: [
+                  { _id: "2-3-1-1", name: "Samsung", slug: "samsung", children: [] },
+                  { _id: "2-3-1-2", name: "Pixel", slug: "pixel", children: [] }
+              ] 
+          },
+          { 
+              _id: "2-3-2", 
+              name: "iOS", 
+              slug: "ios", 
+              children: [
+                  { _id: "2-3-2-1", name: "iPhone 15", slug: "iphone-15", children: [] },
+                  { _id: "2-3-2-2", name: "iPhone 14", slug: "iphone-14", children: [] }
+              ] 
+          }
+        ]
+      },
+       {
+        _id: "2-4",
+        name: "Smartphones",
+        slug: "smartphones",
+        children: [
+          { 
+              _id: "2-4-1", 
+              name: "Android", 
+              slug: "android", 
+              children: [
+                  { _id: "2-4-1-1", name: "Samsung", slug: "samsung", children: [] },
+                  { _id: "2-4-1-2", name: "Pixel", slug: "pixel", children: [] }
+              ] 
+          },
+          { 
+              _id: "2-4-2", 
+              name: "iOS", 
+              slug: "ios", 
+              children: [
+                  { _id: "2-4-2-1", name: "iPhone 15", slug: "iphone-15", children: [] },
+                  { _id: "2-4-2-2", name: "iPhone 14", slug: "iphone-14", children: [] }
+              ] 
+          }
+        ]
+      },
+       {
+        _id: "2-5",
+        name: "Smartphones",
+        slug: "smartphones",
+        children: [
+          { 
+              _id: "2-5-1", 
+              name: "Android", 
+              slug: "android", 
+              children: [
+                  { _id: "2-5-1-1", name: "Samsung", slug: "samsung", children: [] },
+                  { _id: "2-5-1-2", name: "Pixel", slug: "pixel", children: [] }
+              ] 
+          },
+          { 
+              _id: "2-5-2", 
+              name: "iOS", 
+              slug: "ios", 
+              children: [
+                  { _id: "2-5-2-1", name: "iPhone 15", slug: "iphone-15", children: [] },
+                  { _id: "2-5-2-2", name: "iPhone 14", slug: "iphone-14", children: [] }
+              ] 
+          }
+        ]
       }
     ]
   },
@@ -144,6 +244,49 @@ export const categoriesData = [
         children: [
             { _id: "3-2-1", name: "Watches", slug: "watches", children: [] },
             { _id: "3-2-2", name: "Belts", slug: "belts", children: [] }
+        ]
+      },
+       {
+        _id: "3-3",
+        name: "Accessories",
+        slug: "accessories",
+        children: [
+            { _id: "3-3-1", name: "Watches", slug: "watches", children: [] },
+            { _id: "3-3-2", name: "Belts", slug: "belts", children: [] }
+        ]
+      },
+       {
+        _id: "3-4",
+        name: "Accessories",
+        slug: "accessories",
+        children: [
+            { _id: "3-4-1", name: "Watches", slug: "watches", children: [] },
+            { _id: "3-4-2", name: "Belts", slug: "belts", children: [] }
+        ]
+      }, {
+        _id: "3-5",
+        name: "Accessories",
+        slug: "accessories",
+        children: [
+            { _id: "3-5-1", name: "Watches", slug: "watches", children: [] },
+            { _id: "3-5-2", name: "Belts", slug: "belts", children: [] }
+        ]
+      }
+      , {
+        _id: "3-6",
+        name: "Accessories",
+        slug: "accessories",
+        children: [
+            { _id: "3-6-1", name: "Watches", slug: "watches", children: [] },
+            { _id: "3-6-2", name: "Belts", slug: "belts", children: [] }
+        ]
+      }, {
+        _id: "3-7",
+        name: "Accessories",
+        slug: "accessories",
+        children: [
+            { _id: "3-7-1", name: "Watches", slug: "watches", children: [] },
+            { _id: "3-7-2", name: "Belts", slug: "belts", children: [] }
         ]
       }
     ]

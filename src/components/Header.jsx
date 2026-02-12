@@ -59,7 +59,7 @@ export default function Header({ onCatalogClick }) {
   }, [showCategories]);
 
   return (
-    <header className="w-full font-sans relative z-50">
+    <header className="w-full sticky top-0  font-sans relative z-1111">
       {/* 🔹 TOP BAR */}
       <div className="bg-[#0C4BB2] text-white">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -109,6 +109,7 @@ export default function Header({ onCatalogClick }) {
             <MegaMenu 
                 data={categoriesData} 
                 onNavigate={(item) => handleCategoryClick(item.slug)} 
+                onClose={() => setShowCategories(false)}
             />
           </div>
         )}
@@ -146,7 +147,7 @@ function DropdownButton({ label, icon, isOpen, onClick, children }) {
 // =============================================================================
 // 🔹 DESKTOP MEGA MENU (WITH BREADCRUMBS)
 // =============================================================================
-function MegaMenu({ data, onNavigate }) {
+function MegaMenu({ data, onNavigate ,onClose}) {
   const [history, setHistory] = useState([]);
 
   // Logic: Show children of last item, or root data
@@ -225,7 +226,7 @@ function MegaMenu({ data, onNavigate }) {
 {/* 🔹 Bottom Text (Sirf tab dikhega jab 20 se zyada items honge) */}
     {currentItems.length > 20 && (
       <div className="border-t border-gray-200 mt-6 pt-4 text-center w-full">
-        <Link to="/categories" className="text-sm font-semibold text-[#0C4BB2] hover:underline">
+        <Link to="/categories" onClick={onClose}  className="text-sm font-semibold text-[#0C4BB2] hover:underline">
           View All Categories
         </Link>
        

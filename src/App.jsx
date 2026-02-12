@@ -9,6 +9,7 @@ import Catalogs from './pages/Catalogs'
 import ProductDetails from './pages/ProductDetails';
 import CategoryPage from './pages/CategoryPage';
 import CategoriesPage from './pages/CategoriesPage';
+import SingleCategoryPage from './pages/SingleCategoryPage';
 // import CategoryPage from './pages/CategoryPage'; // Agar banaya hai to uncomment karein
 function App() {
   const [showCatalog, setShowCatalog] = useState(false);
@@ -33,15 +34,15 @@ function App() {
       <Header onCatalogClick={onCatalogClick} />
 
       <Routes>
-          <Route path="/" element={<CategoryPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/" element={<CategoryPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/category/:slug" element={<SingleCategoryPage />} />
 
-          
-          {/* Category Page ka Route (Jo pichle step me banaya tha) */}
-          {/* <Route path="/category/:slug" element={<CategoryPage />} /> */}
-          
-          {/* Product Details ko bhi Route bana dena chahiye ideally */}
-          <Route path="/product/:id" element={<ProductDetails />} />
+        {/* Category Page ka Route (Jo pichle step me banaya tha) */}
+        {/* <Route path="/category/:slug" element={<CategoryPage />} /> */}
+
+        {/* Product Details ko bhi Route bana dena chahiye ideally */}
+        <Route path="/product/:id" element={<ProductDetails />} />
       </Routes>
 
       {/* Catalog Modal */}
@@ -51,7 +52,7 @@ function App() {
 
       {/* Note: ProductDetails yahan niche direct render karne se wo har page par dikhega.
           Ise upar Routes ke andar dalna behtar hai. */}
-      {/* <ProductDetails /> */} 
+      {/* <ProductDetails /> */}
     </>
   );
 }

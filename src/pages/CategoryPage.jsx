@@ -17,6 +17,7 @@ import airtank from "../assets/images/categories/air-tanks.png";
 
 import arrowLeft from "../assets/images/ui/arrow-left.png";
 import arrowRight from "../assets/images/ui/arrow-right.png";
+import HeroSlider from "../components/HeroSlider";
 
 /* 🔹 TEMP PRODUCT DATA */
 const products = [
@@ -51,6 +52,7 @@ export default function CategoryPage() {
   return (
     <>
        {/* <Header />  */}
+       <HeroSlider/>
 
       {/* 🔹 TOP SECTION */}
       <div className="bg-[#EFF3FF] pt-6 pb-4">
