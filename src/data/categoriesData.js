@@ -654,5 +654,43 @@ export const categoriesData = [
         ]
       }
     ]
+  },
+   {
+    _id: "21",
+    name: "Electrical",
+    slug: "electrical-components",
+    children: [
+      {
+        _id: "21-1",
+        name: "Lighting",
+        slug: "lighting-electrical",
+        children: [
+          {
+            _id: "21-1-1",
+            name: "LED Bulbs",
+            slug: "led-bulbs",
+            children: [
+                { _id: "21-1-1-1", name: "Smart Bulbs", slug: "smart-bulbs", children: [] },
+                { _id: "21-1-1-2", name: "Dimmable", slug: "dimmable-led", children: [] }
+            ]
+          },
+          {
+            _id: "21-1-2",
+            name: "Fixtures",
+            slug: "light-fixtures",
+            children: []
+          }
+        ]
+      },
+      {
+        _id: "21-2",
+        name: "Wiring",
+        slug: "wiring",
+        children: [
+             { _id: "21-2-1", name: "Cables", slug: "cables", children: [] },
+             { _id: "21-2-2", name: "Switches", slug: "switches", children: [] }
+        ]
+      }
+    ]
   }
 ];

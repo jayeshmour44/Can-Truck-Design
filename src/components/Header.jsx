@@ -1,63 +1,53 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"; 
 
-// 🔹 ICONS IMPORT
+// 🔹 ICONS
 import { 
-  ChevronLeft, 
-  ChevronRight, 
   X, 
   Package,       
   Wrench,        
   Search,        
   FileText,      
-  ListChecks     
+  ListChecks,
+  ChevronRight,
+  ChevronLeft, 
+  Home
 } from "lucide-react";
 
-// 🔹 IMPORT DATA
+// 🔹 IMPORT DATA (Ensure this path is correct)
 import { categoriesData } from "../data/categoriesData"; 
 
-/* 🔹 IMAGES */
+/* 🔹 IMAGES (Ensure these paths are correct) */
 import logo from "../assets/images/logo.png";
 import catIcon from "../assets/images/icon-categories.png";
 import partsIcon from "../assets/images/icon-parts-finder.png";
 import catalogueIcon from "../assets/images/icon-catalogue.png";
 import brandsIcon from "../assets/images/icon-brands.png";
 import dropdownIcon from "../assets/images/icon-dropdown.png";
-import arrowRight from "../assets/images/arrow-right.png";
 import searchIcon from "../assets/images/search.png"; 
 
+// =============================================================================
+// 🔹 MAIN HEADER COMPONENT
+// =============================================================================
 export default function Header({ onCatalogClick }) {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
 
-  // Mobile States
-  const [mobileLevel1, setMobileLevel1] = useState(null);
-  const [mobileSelectedCategory, setMobileSelectedCategory] = useState(null);
-  const [mobileSelectedSubCat, setMobileSelectedSubCat] = useState(null);
-
-  // 🔹 1. CATEGORY NAVIGATION (Drill Down Leaf Node)
-  const handleCategoryNavigation = (item) => {
-    if (item.children && item.children.length > 0) return;
-
-    // Reset everything, Close Menu & Navigate
-    setShowCategories(false); 
-    setMobileOpen(false);    
-    setMobileLevel1(null);
-    setMobileSelectedCategory(null);
-    setMobileSelectedSubCat(null);
-
-    navigate(`/category/${item.slug}`); 
-  };
-
-  // 🔹 2. STATIC PAGE NAVIGATION (Direct Links)
-  const handleStaticNavigation = (path) => {
+  // 🔹 Navigation Handler (Resets Menu)
+  const handleNavigation = (path) => {
     setMobileOpen(false);
     setShowCategories(false);
     navigate(path);
   };
 
-  /* Scroll Lock & Outside Click Effects */
+  const handleCategoryClick = (categorySlug) => {
+    setMobileOpen(false);
+    setShowCategories(false);
+    navigate(`/category/${categorySlug}`);
+  };
+
+  /* Scroll Lock */
   useEffect(() => { document.body.style.overflow = mobileOpen ? "hidden" : "auto"; }, [mobileOpen]);
   
   useEffect(() => {
@@ -69,7 +59,7 @@ export default function Header({ onCatalogClick }) {
   }, [showCategories]);
 
   return (
-    <header className="w-full font-sans">
+    <header className="w-full font-sans relative z-50">
       {/* 🔹 TOP BAR */}
       <div className="bg-[#0C4BB2] text-white">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -82,18 +72,16 @@ export default function Header({ onCatalogClick }) {
             {[
               { name: "Home", path: "/" },
               { name: "Products", path: "/products" },
-              { name: "Documentation & Support", path: "/support" },
+              { name: "Support", path: "/support" },
               { name: "Brands", path: "/brands" },
-              { name: "Pricing/Quote", path: "/quote" },
-              { name: "Contact us", path: "/contact" },
-              { name: "About Us", path: "/about" }
+              { name: "Contact", path: "/contact" }
             ].map((item) => (
               <a key={item.name} onClick={() => navigate(item.path)} className="hover:underline cursor-pointer">{item.name}</a>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center bg-white rounded-md px-3 py-2 w-56">
-            <img src={searchIcon} className="h-4 w-4 mr-2" />
+            <img src={searchIcon} className="h-4 w-4 mr-2" alt="search" />
             <input className="outline-none text-sm text-black w-full" placeholder="Search" />
           </div>
         </div>
@@ -115,13 +103,12 @@ export default function Header({ onCatalogClick }) {
           </div>
         </div>
 
-        {/* 🔹 MEGA MENU (DESKTOP) */}
+        {/* 🔹 DESKTOP MEGA MENU */}
         {showCategories && (
           <div className="relative z-40 category-wrapper">
             <MegaMenu 
-                arrowRight={arrowRight} 
                 data={categoriesData} 
-                onNavigate={handleCategoryNavigation} 
+                onNavigate={(item) => handleCategoryClick(item.slug)} 
             />
           </div>
         )}
@@ -131,306 +118,264 @@ export default function Header({ onCatalogClick }) {
       {mobileOpen && (
         <MobileMenu
           close={() => setMobileOpen(false)}
-          
-          // State Props
-          mobileLevel1={mobileLevel1}
-          setMobileLevel1={setMobileLevel1}
-          mobileSelectedCategory={mobileSelectedCategory}
-          setMobileSelectedCategory={setMobileSelectedCategory}
-          mobileSelectedSubCat={mobileSelectedSubCat}
-          setMobileSelectedSubCat={setMobileSelectedSubCat}
-          
           data={categoriesData}
-          
-          // Navigation Functions
-          onNavigate={handleCategoryNavigation} 
-          onStaticNavigate={handleStaticNavigation} 
+          onNavigateCategory={handleCategoryClick}
+          onNavigateStatic={handleNavigation}
         />
       )}
     </header>
   );
 }
 
-/* ... DropdownButton Component ... */
+// =============================================================================
+// 🔹 HELPER COMPONENT: DROPDOWN BUTTON
+// =============================================================================
 function DropdownButton({ label, icon, isOpen, onClick, children }) {
     return (
       <div className="relative">
         <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-semibold border transition ${isOpen ? "bg-[#0B4DB8] text-white" : "bg-white text-[#0B4DB8]"}`}>
-          <img src={icon} className={`h-4 transition-all ${isOpen ? "invert brightness-0" : ""}`} style={!isOpen ? { filter: "invert(23%) sepia(89%) saturate(2600%) hue-rotate(205deg) brightness(90%) contrast(95%)" } : {}} />
+          <img src={icon} alt="" className={`h-4 transition-all ${isOpen ? "invert brightness-0" : ""}`} style={!isOpen ? { filter: "invert(23%) sepia(89%) saturate(2600%) hue-rotate(205deg) brightness(90%) contrast(95%)" } : {}} />
           {label}
-           <img src={dropdownIcon} className={`h-3 ml-1 transition-transform duration-200 ${isOpen ? "rotate-180 invert brightness-0" : ""}`} style={!isOpen ? { filter: "invert(23%) sepia(89%) saturate(2600%) hue-rotate(205deg) brightness(90%) contrast(95%)" } : {}} />
+           <img src={dropdownIcon} alt="" className={`h-3 ml-1 transition-transform duration-200 ${isOpen ? "rotate-180 invert brightness-0" : ""}`} style={!isOpen ? { filter: "invert(23%) sepia(89%) saturate(2600%) hue-rotate(205deg) brightness(90%) contrast(95%)" } : {}} />
         </button>
         {isOpen && children}
       </div>
     );
 }
 
-/* ... MegaMenu Component (Desktop) ... */
-function MegaMenu({ arrowRight, data, onNavigate }) {
-  const [selectedLevel1, setSelectedLevel1] = useState(null);
-  const [selectedLevel2, setSelectedLevel2] = useState(null);
-  const [selectedLevel3, setSelectedLevel3] = useState(null);
+// =============================================================================
+// 🔹 DESKTOP MEGA MENU (WITH BREADCRUMBS)
+// =============================================================================
+function MegaMenu({ data, onNavigate }) {
+  const [history, setHistory] = useState([]);
 
-  const handleItemClick = (item, setNextLevel) => {
+  // Logic: Show children of last item, or root data
+  const currentItems = history.length === 0 ? data : history[history.length - 1].children;
+
+  const handleItemClick = (item) => {
     if (item.children && item.children.length > 0) {
-      setNextLevel(item);
+      setHistory([...history, item]);
     } else {
       onNavigate(item);
     }
   };
 
+  // Breadcrumb Logic
+  const handleBreadcrumbClick = (index) => {
+    if (index === -1) {
+      setHistory([]); // Reset to Main
+    } else {
+      setHistory(history.slice(0, index + 1)); // Go back to specific level
+    }
+  };
+
   return (
-    <div className="w-full bg-white shadow-xl px-10 py-8 text-sm">
-      {/* LEVEL 1 */}
-      {!selectedLevel1 && (
-        <>
-          <h3 className="mb-6 text-lg font-bold text-[#0C4BB2] border-b pb-2">Select a Category</h3>
-          <div className="grid grid-cols-4 gap-y-2 gap-x-4">
-            {data.map((category) => (
-              <div key={category._id} className="flex justify-between items-center cursor-pointer group hover:bg-blue-50 p-1 rounded transition" onClick={() => handleItemClick(category, setSelectedLevel1)}>
-                <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">{category.name}</span>
-                {category.children?.length > 0 && <ChevronRight size={16} className="text-gray-400 group-hover:text-[#0C4BB2]" />}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+    <div className="w-full bg-white shadow-xl px-10 py-8 text-sm absolute left-0 top-full border-t z-50">
+      
+      {/* Breadcrumbs Header */}
+      <div className="flex items-center gap-2 text-gray-500 mb-6 border-b pb-2 text-[15px]">
+        <span 
+          className={`cursor-pointer hover:text-[#0C4BB2] hover:underline ${history.length === 0 ? "font-bold text-[#0C4BB2]" : ""}`}
+          onClick={() => handleBreadcrumbClick(-1)}
+        >
+          All Categories
+        </span>
 
-      {/* LEVEL 2 */}
-      {selectedLevel1 && !selectedLevel2 && (
-        <>
-          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6 border-b pb-2">
-            <button className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold" onClick={() => setSelectedLevel1(null)}>
-              <ChevronLeft size={18} /> Back
-            </button>
-            <h2 className="text-[16px] text-[#0C4BB2] font-bold">{selectedLevel1.name}</h2>
-          </div>
-          <div className="grid grid-cols-4 gap-12">
-            <div className="flex flex-col gap-4">
-              {selectedLevel1.children.map((subItem) => (
-                <div key={subItem._id} className="flex justify-between items-center cursor-pointer group" onClick={() => handleItemClick(subItem, setSelectedLevel2)}>
-                  <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">{subItem.name}</span>
-                  {subItem.children?.length > 0 && <ChevronRight size={18} className="text-gray-400 group-hover:text-[#0C4BB2]" />}
-                </div>
-              ))}
+        {history.map((item, index) => {
+          const isLast = index === history.length - 1;
+          return (
+            <div key={item._id} className="flex items-center gap-2">
+              <ChevronRight size={14} className="text-gray-400" />
+              <span 
+                className={`cursor-pointer hover:text-[#0C4BB2] hover:underline ${isLast ? "font-bold text-[#0C4BB2]" : ""}`}
+                onClick={() => handleBreadcrumbClick(index)}
+              >
+                {item.name}
+              </span>
             </div>
-          </div>
-        </>
-      )}
+          );
+        })}
+      </div>
 
-      {/* LEVEL 3 */}
-      {selectedLevel2 && !selectedLevel3 && (
-        <>
-          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6 border-b pb-2">
-            <button className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold" onClick={() => setSelectedLevel2(null)}>
-              <ChevronLeft size={18} /> Back 
-            </button>
-            <h2 className="text-[16px] text-[#0C4BB2] font-bold">{selectedLevel1.name} <span className="mx-2 text-gray-400">/</span> {selectedLevel2.name}</h2>
-          </div>
-          <div className="grid grid-cols-4 gap-12">
-            <div className="flex flex-col gap-4">
-              {selectedLevel2.children.map((child) => (
-                <div key={child._id} className="flex justify-between items-center cursor-pointer group" onClick={() => handleItemClick(child, setSelectedLevel3)}>
-                  <span className="text-[18px] text-[#0C4BB2] group-hover:text-[#0C4BB2]">{child.name}</span>
-                  {child.children?.length > 0 && <ChevronRight size={18} className="text-gray-400 group-hover:text-[#0C4BB2]" />}
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+      {/* Grid Content */}
+      {(!currentItems || currentItems.length === 0) ? (
+         <p className="text-gray-500 italic">No sub-categories found.</p>
+      ) : (
+<div className="grid grid-rows-[repeat(5,min-content)] grid-flow-col gap-x-12 gap-y-3 h-auto">  
+          {currentItems.slice(0, 20).map((item) => (
+          <div
+            key={item._id}
+            className="flex justify-between items-center cursor-pointer group hover:bg-blue-50 p-2 rounded transition max-w-[300px]"
+            onClick={() => handleItemClick(item)}
+          >
+            <span className="text-[15px] text-gray-700 font-medium group-hover:text-[#0C4BB2]">
+              {item.name}
+            </span>
 
-      {/* LEVEL 4 */}
-      {selectedLevel3 && (
-        <>
-          <div className="flex items-center gap-4 text-[#0C4BB2] mb-6 border-b pb-2">
-            <button className="flex items-center gap-2 text-gray-600 text-[18px] hover:text-[#0C4BB2] font-semibold" onClick={() => setSelectedLevel3(null)}>
-              <ChevronLeft size={18} /> Back 
-            </button>
-            <h2 className="text-[16px] text-[#0C4BB2] font-bold">{selectedLevel2.name} <span className="mx-2 text-gray-400">/</span> {selectedLevel3.name}</h2>
+            {item.children?.length > 0 && (
+              <ChevronRight
+                size={16}
+                className="text-gray-300 group-hover:text-[#0C4BB2]"
+              />
+            )}
           </div>
-          {selectedLevel3.children?.length === 0 ? (
-            <p className="text-gray-500 italic">No further sub-categories found.</p>
-          ) : (
-            <div className="grid grid-cols-4 gap-12">
-              <div className="flex flex-col gap-4">
-                  {selectedLevel3.children.map((deepChild) => (
-                <div key={deepChild._id} className="p-1 cursor-pointer text-[18px] text-[#0C4BB2] hover:bg-blue-50 transition" onClick={() => onNavigate(deepChild)}>
-                  {deepChild.name}
-                </div>
-              ))}
-              </div>
-            </div>
-          )}
-        </>
+        ))}
+      </div>
       )}
-    </div>
+{/* 🔹 Bottom Text (Sirf tab dikhega jab 20 se zyada items honge) */}
+    {currentItems.length > 20 && (
+      <div className="border-t border-gray-200 mt-6 pt-4 text-center w-full">
+        <Link to="/categories" className="text-sm font-semibold text-[#0C4BB2] hover:underline">
+          View All Categories
+        </Link>
+       
+      </div>
+    )}
+
+         </div>
   );
 }
 
 
-/* =================================================================
-   🔹 MOBILE MENU (CORRECTED & FINALIZED)
-   ================================================================= */
-function MobileMenu({ close, mobileLevel1, setMobileLevel1, mobileSelectedCategory, setMobileSelectedCategory, mobileSelectedSubCat, setMobileSelectedSubCat, data, onNavigate, onStaticNavigate }) {
+// =============================================================================
+// 🔹 MOBILE MENU (WITH SCROLLABLE BREADCRUMBS)
+// =============================================================================
+function MobileMenu({ close, data, onNavigateCategory, onNavigateStatic }) {
     
-    // 🔹 Main Menu Items
+    const [history, setHistory] = useState([]);
+
+    // Static Items
     const mainMenuItems = [
-        { 
-            name: "Categories", 
-            icon: <Package size={20} />, 
-            action: () => setMobileLevel1("Categories"), // Drill down
-            hasArrow: true
-        },
-        { 
-            name: "Find Service", 
-            icon: <Wrench size={20} />, 
-            action: () => onStaticNavigate('/find-service'), 
-            hasArrow: true
-        },
-        { 
-            name: "Parts Finder", 
-            icon: <Search size={20} />, 
-            action: () => onStaticNavigate('/parts-finder'), 
-            hasArrow: true
-        },
-        { 
-            name: "Diagrams", 
-            icon: <FileText size={20} />, 
-            action: () => onStaticNavigate('/diagrams'), 
-            hasArrow: true
-        },
-        { 
-            name: "Quick Order", 
-            icon: <ListChecks size={20} />, 
-            action: () => onStaticNavigate('/quick-order'), 
-            hasArrow: false
-        }
+        { name: "Find Service", icon: <Wrench size={20} />, path: '/find-service', hasArrow: true },
+        { name: "Parts Finder", icon: <Search size={20} />, path: '/parts-finder', hasArrow: true },
+        { name: "Diagrams", icon: <FileText size={20} />, path: '/diagrams', hasArrow: true },
+        { name: "Quick Order", icon: <ListChecks size={20} />, path: '/quick-order', hasArrow: false }
     ];
 
-    // 🔹 Bottom Links
     const bottomLinks = [
         { name: "Home", path: "/" },
         { name: "Products", path: "/products" },
-        { name: "Documentation & Support", path: "/support" },
+        { name: "Support", path: "/support" },
         { name: "Brands", path: "/brands" },
-        { name: "Pricing / Quote", path: "/quote" },
-        { name: "Contact us", path: "/contact" },
-        { name: "About Us", path: "/about" }
+        { name: "Contact", path: "/contact" }
     ];
 
+    const currentList = history.length === 0 ? data : history[history.length - 1].children;
+    const isMainMenu = history.length === 0;
+
+    const handleItemClick = (item) => {
+        if (item.children && item.children.length > 0) {
+            setHistory([...history, item]);
+        } else {
+            onNavigateCategory(item.slug);
+        }
+    };
+
+    const handleBack = () => {
+        setHistory((prev) => prev.slice(0, prev.length - 1));
+    };
+
+    const handleBreadcrumbClick = (index) => {
+        if (index === -1) {
+            setHistory([]);
+        } else {
+            setHistory(history.slice(0, index + 1));
+        }
+    };
+
     return (
-      <div className="fixed inset-0 z-50 bg-black/40 text-[#0C4BB2] lg:hidden">
+      <div className="fixed inset-0 z-50 bg-black/40 text-[#0C4BB2] lg:hidden animate-fade-in">
         
-        {/* Sidebar Container */}
-        <div className="w-[85%] max-w-[350px] h-full bg-white flex flex-col shadow-2xl">
+        <div className="w-[85%] max-w-[350px] h-full bg-white flex flex-col shadow-2xl animate-slide-in">
           
           {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b bg-gray-50">
-             <h3 className="font-bold text-lg text-gray-800">Menu</h3>
+          <div className="p-4 border-b bg-gray-50 flex justify-between items-center sticky top-0 z-10 shrink-0">
+             <div className="flex items-center gap-2">
+                 {!isMainMenu && (
+                     <button onClick={handleBack} className="p-1 hover:bg-gray-200 rounded-full mr-1">
+                         <ChevronLeft size={22} className="text-[#0C4BB2]" />
+                     </button>
+                 )}
+                 <h3 className="font-bold text-lg text-gray-800 truncate max-w-[200px]">
+                     {isMainMenu ? "Menu" : history[history.length - 1].name}
+                 </h3>
+             </div>
+
              <button onClick={close} className="p-1 hover:bg-gray-200 rounded-full">
                 <X size={24} className="text-gray-600" />
              </button>
           </div>
+
+          {/* Breadcrumbs (Scrollable) */}
+          {!isMainMenu && (
+             <div className="px-4 py-2 bg-blue-50 border-b flex items-center gap-1 overflow-x-auto whitespace-nowrap text-xs no-scrollbar">
+                <span onClick={() => handleBreadcrumbClick(-1)} className="text-gray-500 cursor-pointer hover:text-[#0C4BB2] flex-shrink-0">All</span>
+                
+                {history.map((item, index) => (
+                    <div key={item._id} className="flex items-center gap-1 flex-shrink-0">
+                        <ChevronRight size={10} className="text-gray-400" />
+                        <span 
+                            onClick={() => handleBreadcrumbClick(index)}
+                            className={`cursor-pointer ${index === history.length - 1 ? "font-bold text-[#0C4BB2]" : "text-gray-500 hover:text-[#0C4BB2]"}`}
+                        >
+                            {item.name}
+                        </span>
+                    </div>
+                ))}
+             </div>
+          )}
   
-          {/* Scrollable Content */}
+          {/* Content Area */}
           <div className="flex-1 overflow-y-auto">
 
-            {/* --- VIEW 1: MAIN MENU LIST --- */}
-            {!mobileLevel1 && (
+            {/* A. MAIN MENU */}
+            {isMainMenu && (
               <div className="flex flex-col">
-                 <div className="flex flex-col">
-                    {mainMenuItems.map((item, index) => (
-                        <div key={index} onClick={item.action} className="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors">
-                            <div className="flex items-center gap-4">
-                                <span className="text-[#0C4BB2]">{item.icon}</span>
-                                <span className="font-bold text-gray-800 text-sm">{item.name}</span>
-                            </div>
-                            {item.hasArrow && <ChevronRight size={18} className="text-gray-400" />}
-                        </div>
-                    ))}
-                 </div>
-                 
-                 {/* Bottom Links */}
-                 <div className="flex flex-col bg-gray-50 p-4 gap-4 mt-2">
+                  <div className="flex flex-col">
+                     {mainMenuItems.map((item, index) => (
+                         <div key={index} onClick={() => onNavigateStatic(item.path)} className="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-50">
+                             <div className="flex items-center gap-4">
+                                 <span className="text-[#0C4BB2]">{item.icon}</span>
+                                 <span className="font-bold text-gray-800 text-sm">{item.name}</span>
+                             </div>
+                             {item.hasArrow && <ChevronRight size={18} className="text-gray-400" />}
+                         </div>
+                     ))}
+                  </div>
+                  <div className="p-4 bg-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                     Categories
+                  </div>
+              </div>
+            )}
+
+            {/* B. DYNAMIC LIST */}
+            <div className="flex flex-col">
+                {currentList && currentList.map((item) => (
+                    <div 
+                        key={item._id} 
+                        className="flex justify-between items-center p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-50 active:bg-blue-100 transition-colors"
+                        onClick={() => handleItemClick(item)}
+                    >
+                        <span className="font-medium text-gray-700 text-[15px]">{item.name}</span>
+                        {item.children && item.children.length > 0 && <ChevronRight size={18} className="text-gray-400" />}
+                    </div>
+                ))}
+
+                {!isMainMenu && (!currentList || currentList.length === 0) && (
+                    <div className="p-6 text-center text-gray-500 italic text-sm">No items found.</div>
+                )}
+            </div>
+
+            {/* C. BOTTOM LINKS */}
+            {isMainMenu && (
+                 <div className="flex flex-col bg-gray-50 p-4 gap-4 mt-auto border-t">
                     {bottomLinks.map((link, index) => (
-                        <p 
-                            key={index} 
-                            className="text-gray-600 font-medium text-sm cursor-pointer hover:text-[#0C4BB2]"
-                            onClick={() => onStaticNavigate(link.path)}
-                        >
+                        <p key={index} className="text-gray-600 font-medium text-sm cursor-pointer hover:text-[#0C4BB2]" onClick={() => onNavigateStatic(link.path)}>
                             {link.name}
                         </p>
                     ))}
                  </div>
-              </div>
             )}
-            
-            {/* --- VIEW 2: CATEGORIES (Level 1) --- */}
-            {mobileLevel1 === "Categories" && !mobileSelectedCategory && (
-              <div className="p-4">
-                <button onClick={() => setMobileLevel1(null)} className="mb-4 flex items-center gap-2 text-gray-500 font-semibold">
-                    <ChevronLeft size={20} /> <span>Main Menu</span>
-                </button>
-                <h3 className="font-bold text-[18px] mb-4 text-[#0C4BB2] border-b pb-2">All Categories</h3>
-                {data.map((category) => (
-                    <div key={category._id}>
-                        <p className="font-medium py-3 border-b flex justify-between items-center cursor-pointer hover:bg-gray-50" onClick={() => setMobileSelectedCategory(category)}>
-                           {category.name} <ChevronRight size={16} className="text-gray-400" />
-                        </p>
-                    </div>
-                ))}
-              </div>
-            )}
-    
-            {/* --- VIEW 3: SUB-CATEGORIES (Level 2) --- */}
-            {mobileSelectedCategory && !mobileSelectedSubCat && (
-              <div className="p-4">
-                <button onClick={() => setMobileSelectedCategory(null)} className="mb-4 flex items-center gap-2 text-gray-500 font-semibold">
-                    <ChevronLeft size={20} /> <span>Back</span>
-                </button>
-                <h4 className="font-bold mb-4 text-xl text-[#0C4BB2]">{mobileSelectedCategory.name}</h4>
-                {mobileSelectedCategory.children.map((subItem) => (
-                  <p key={subItem._id} className="flex justify-between items-center py-3 border-b cursor-pointer hover:bg-gray-50"
-                    onClick={() => {
-                        if(subItem.children && subItem.children.length > 0) {
-                            setMobileSelectedSubCat(subItem);
-                        } else {
-                             onNavigate(subItem); // ✅ Navigates and Closes Menu
-                        }
-                    }}
-                  >
-                    <span className="text-sm font-medium">{subItem.name}</span>
-                    {subItem.children && subItem.children.length > 0 && <ChevronRight size={16} className="text-gray-400" />}
-                  </p>
-                ))}
-              </div>
-            )}
-    
-            {/* --- VIEW 4: CHILD ITEMS (Level 3) --- */}
-            {mobileSelectedSubCat && (
-              <div className="p-4">
-                <button onClick={() => setMobileSelectedSubCat(null)} className="mb-4 flex items-center gap-2 text-gray-500 font-semibold">
-                    <ChevronLeft size={20} /> <span>Back</span>
-                </button>
-                <h4 className="font-bold mb-2 text-lg text-[#0C4BB2]">{mobileSelectedSubCat.name}</h4>
-                {mobileSelectedSubCat.children.length === 0 ? (
-                    <p className="text-gray-500 italic py-2">No further items.</p>
-                ) : (
-                    mobileSelectedSubCat.children.map((child) => (
-                        <p 
-                            key={child._id} 
-                            
-                            className="py-3 border-b text-sm font-medium hover:bg-gray-50 cursor-pointer" 
-                            onClick={() => onNavigate(child)} // ✅ Navigates and Closes Menu
-                        >
-                           {child.name}
-                        </p>
-                    ))
-                )}
-              </div>
-            )}
-
           </div>
         </div>
       </div>

@@ -8,8 +8,8 @@ import Home from './pages/Home'
 import Catalogs from './pages/Catalogs'
 import ProductDetails from './pages/ProductDetails';
 import CategoryPage from './pages/CategoryPage';
+import CategoriesPage from './pages/CategoriesPage';
 // import CategoryPage from './pages/CategoryPage'; // Agar banaya hai to uncomment karein
-
 function App() {
   const [showCatalog, setShowCatalog] = useState(false);
 
@@ -34,6 +34,8 @@ function App() {
 
       <Routes>
           <Route path="/" element={<CategoryPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+
           
           {/* Category Page ka Route (Jo pichle step me banaya tha) */}
           {/* <Route path="/category/:slug" element={<CategoryPage />} /> */}
